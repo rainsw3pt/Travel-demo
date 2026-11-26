@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Route — туры мечты</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #fff;
+            background: #111;
+        }
+
+       
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 6%;
+            z-index: 1000;
+            transition: background 0.3s ease;
+        }
+
+        header.scrolled { background: rgba(0, 0, 0, 0.85); }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ffd166;
+            text-decoration: none;
+        }
+
+        nav ul { display: flex; gap: 25px; list-style: none; flex-wrap: wrap; }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 6px 2px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        nav a:hover { border-bottom-color: #ffd166; }
+
+        
+        section { padding: 90px 8%; }
+        section h2 { text-align: center; font-size: 2.2rem; margin-bottom: 50px; }
+        section h2 span { color: #ffd166; }
+        section .subtitle {
+            text-align: center;
+            color: #aaa;
+            max-width: 600px;
+            margin: -35px auto 50px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 42px;
+            background: #ffd166;
+            color: #222;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255, 209, 102, 0.4); }
+        .btn-outline {
+            background: transparent;
+            color: #ffd166;
+            border: 2px solid #ffd166;
+        }
+        .btn-outline:hover { box-shadow: 0 10px 25px rgba(255, 209, 102, 0.25); }
+
+        
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.7)),
+                url(images/ПЕРВАЯ\ КАРТИНКА.avif);
+            background-size: cover;
+            background-position: center;
+        }
+        .hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); margin-bottom: 20px; text-shadow: 0 2px 12px rgba(0,0,0,0.8); }
+        .hero p { font-size: 1.2rem; margin-bottom: 35px; max-width: 600px; }
+        .hero-buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            background: rgba(255, 209, 102, 0.06);
+            padding: 50px 8%;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .stat-item { text-align: center; }
+        .stat-item .num { font-size: 2.6rem; font-weight: 700; color: #ffd166; }
+        .stat-item .label { color: #aaa; margin-top: 5px; }
+
+        
+        .tours-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .tour-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .tour-card:hover { transform: translateY(-8px); }
+        .tour-card img { width: 100%; height: 220px; object-fit: cover; }
+        .tour-info { padding: 22px; }
+        .tour-info h3 { margin-bottom: 8px; }
+        .tour-info p { color: #bbb; font-size: 0.95rem; margin-bottom: 15px; }
+        .price { font-size: 1.3rem; font-weight: 700; color: #ffd166; }
+        .tour-card .btn-outline { padding: 10px 30px; font-size: 0.9rem; margin-top: 15px; }
+
+        
+        .destinations { background: #181818; }
+        .dest-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .dest-card {
+            position: relative;
+            height: 260px;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+        }
+        .dest-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+        .dest-card:hover img { transform: scale(1.08); }
+        .dest-card .overlay {
+            position: relative;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .dest-card .overlay small { display: block; font-weight: 400; color: #ccc; margin-top: 3px; }
+
+       
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 30px;
+        }
+        .feature {
+            text-align: center;
+            padding: 35px 25px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            transition: background 0.3s;
+        }
+        .feature:hover { background: rgba(255,209,102,0.07); }
+        .feature .icon { font-size: 2.6rem; margin-bottom: 15px; }
+        .feature h3 { margin-bottom: 10px; }
+        .feature p { color: #bbb; font-size: 0.95rem; }
+
+        
+        
+        .video-section {
+            text-align: center;
+            background: #181818;
+        }
+        .video-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .video-wrapper video { width: 100%; display: block; }
+
+        
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .review {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 30px;
+        }
+        .review .stars { color: #ffd166; margin-bottom: 15px; }
+        .review p { color: #ccc; font-style: italic; margin-bottom: 20px; }
+        .review .author { display: flex; align-items: center; gap: 12px; }
+        .review .author img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .review .author .name { font-weight: 700; }
+        .review .author .from { font-size: 0.85rem; color: #999; }
+
+       
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .plan {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .plan.popular {
+            border-color: #ffd166;
+            background: rgba(255,209,102,0.08);
+            transform: scale(1.04);
+        }
+        .plan .badge {
+            display: inline-block;
+            background: #ffd166;
+            color: #222;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+        .plan h3 { font-size: 1.3rem; margin-bottom: 10px; }
+        .plan .cost { font-size: 2.2rem; font-weight: 700; color: #ffd166; margin-bottom: 25px; }
+        .plan ul { list-style: none; margin-bottom: 30px; }
+        .plan li { padding: 9px 0; color: #ccc; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+        
+        .faq { max-width: 750px; margin: 0 auto; }
+        .faq-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.05rem;
+            padding: 20px 25px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-question::after { content: '+'; font-size: 1.5rem; color: #ffd166; transition: transform 0.3s; }
+        .faq-item.open .faq-question::after { transform: rotate(45deg); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            padding: 0 25px;
+            color: #bbb;
+        }
+        .faq-item.open .faq-answer { max-height: 200px; padding-bottom: 20px; }
+
+        
+        .blog { background: #181818; }
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .post {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .post img { width: 100%; height: 190px; object-fit: cover; }
+        .post-body { padding: 22px; }
+        .post .date { font-size: 0.8rem; color: #999; }
+        .post h3 { margin: 8px 0 10px; font-size: 1.15rem; }
+        .post p { color: #bbb; font-size: 0.92rem; }
+        .post a { color: #ffd166; text-decoration: none; font-size: 0.9rem; }
+
+        
+        .subscribe { text-align: center; }
+        .subscribe form {
+            display: flex;
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .subscribe input {
+            flex: 1;
+            min-width: 240px;
+            padding: 14px 18px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            background: rgba(255,255,255,0.07);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+        .subscribe input:focus { border-color: #ffd166; }
+
+        
+        .contact { background: #181818; }
+        .contact form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .contact input, .contact textarea {
+            padding: 14px 18px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.07);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+        .contact input::placeholder, .contact textarea::placeholder { color: #999; }
+        .contact input:focus, .contact textarea:focus { border-color: #ffd166; }
+
+        
+        footer {
+            text-align: center;
+            padding: 40px 8%;
+            background: rgba(0,0,0,0.7);
+            color: #888;
+            font-size: 0.9rem;
+        }
+        footer .socials { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; font-size: 1.5rem; }
+        footer .socials a { text-decoration: none; transition: transform 0.2s; }
+        footer .socials a:hover { transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <a href="#" class="logo">Golden Route</a>
+        <nav>
+            <ul>
+                <li><a href="#tours">Туры</a></li>
+                <li><a href="#destinations">Направления</a></li>
+                <li><a href="#features">Почему мы</a></li>
+                <li><a href="#reviews">Отзывы</a></li>
+                <li><a href="#pricing">Тарифы</a></li>
+                <li><a href="#faq">Вопросы</a></li>
+                <li><a href="#blog">Блог</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Туры мечты</h1>
+        <p>Авторские путешествия в самые красивые места планеты — от заснеженных вершин до лазурных берегов.</p>
+        <div class="hero-buttons">
+            <a href="#tours" class="btn">Выбрать тур</a>
+            <a href="#contact" class="btn btn-outline">Связаться с нами</a>
+        </div>
+    </section>
+
+    
+    <div class="stats">
+        <div class="stat-item"><div class="num">12</div><div class="label">лет на рынке</div></div>
+        <div class="stat-item"><div class="num">5 000+</div><div class="label">счастливых туристов</div></div>
+        <div class="stat-item"><div class="num">47</div><div class="label">стран мира</div></div>
+        <div class="stat-item"><div class="num">4.9</div><div class="label">рейтинг отзывов</div></div>
+    </div>
+
+    <section id="tours">
+        <h2>Популярные <span>туры</span></h2>
+        <div class="tours-grid">
+            <div class="tour-card">
+                <img src="images/БАЛИ.webp" alt="Бали">
+                <div class="tour-info">
+                    <h3>Бали, Индонезия</h3>
+                    <p>10 дней: рисовые террасы, храмы, сёрфинг и вилла у океана.</p>
+                    <span class="price">от 145 000 ₽</span>
+                    <br><a href="#contact" class="btn btn-outline">Подробнее</a>
+                </div>
+            </div>
+            <div class="tour-card">
+                <img src="images/ПАРИЖ.jpg" alt="Париж">
+                <div class="tour-info">
+                    <h3>Париж, Франция</h3>
+                    <p>7 дней: Эйфелева башня, Лувр и вечерние прогулки по Сене.</p>
+                    <span class="price">от 98 000 ₽</span>
+                    <br><a href="#contact" class="btn btn-outline">Подробнее</a>
+                </div>
+            </div>
+            <div class="tour-card">
+                <img src="images/КАМЧАТКА 3.jpg" alt="Камчатка">
+                <div class="tour-info">
+                    <h3>Камчатка, Россия</h3>
+                    <p>8 дней: вулканы, гейзеры и термальные источники.</p>
+                    <span class="price">от 210 000 ₽</span>
+                    <br><a href="#contact" class="btn btn-outline">Подробнее</a>
+                </div>
+            </div>
+            <div class="tour-card">
+                <img src="images/ДУБАЙСК.jpg" alt="Дубай">
+                <div class="tour-info">
+                    <h3>Дубай, ОАЭ</h3>
+                    <p>6 дней: небоскрёбы, пустыня на джипах и пляжи Персидского залива.</p>
+                    <span class="price">от 120 000 ₽</span>
+                    <br><a href="#contact" class="btn btn-outline">Подробнее</a>
+                </div>
+            </div>
+            <div class="tour-card">
+                <img src="images/НОРВЕГИЯ.jpg" alt="Норвегия">
+                <div class="tour-info">
+                    <h3>Фьорды Норвегии</h3>
+                    <p>9 дней: круиз по фьордам, северное сияние и горные маршруты.</p>
+                    <span class="price">от 165 000 ₽</span>
+                    <br><a href="#contact" class="btn btn-outline">Подробнее</a>
+                </div>
+            </div>
+            <div class="tour-card">
+                <img src="images/ТОКИО.webp" alt="Токио">
+                <div class="tour-info">
+                    <h3>Токио, Япония</h3>
+                    <p>11 дней: сакура, храмы, гадзет-маркеты и гора Фудзи.</p>
+                    <span class="price">от 230 000 ₽</span>
+                    <br><a href="#contact" class="btn btn-outline">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="destinations" class="destinations">
+        <h2>Куда <span>отправиться</span></h2>
+        <div class="dest-grid">
+            <div class="dest-card">
+                <img src="images/ОСТРОВА.jpg" alt="Острова">
+                <div class="overlay"> Острова<small>Мальдивы, Бали, Сейшелы</small></div>
+            </div>
+            <div class="dest-card">
+                <img src="images/ГОРЫ.webp" alt="Горы">
+                <div class="overlay"> Горы<small>Альпы, Камчатка, Гималаи</small></div>
+            </div>
+            <div class="dest-card">
+                <img src="images/ПЛЯЖ.webp" alt="Пляжи">
+                <div class="overlay"> Пляжи<small>Тайланд, Турция, Египет</small></div>
+            </div>
+            <div class="dest-card">
+                <img src="images/ЕВРОПА.jpg" alt="Европа">
+                <div class="overlay"> Европа<small>Париж, Рим, Барселона</small></div>
+            </div>
+            <div class="dest-card">
+                <img src="images/АЗИЯ.webp" alt="Азия">
+                <div class="overlay"> Азия<small>Япония, Вьетнам, Индия</small></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <h2>Почему <span>выбирают нас</span></h2>
+        <div class="features-grid">
+            <div class="feature">
+                <div class="icon"></div>
+                <h3>Гарантии</h3>
+                <p>Все туры застрахованы, договор оформляется официально и прозрачно.</p>
+            </div>
+            <div class="feature">
+                <div class="icon"></div>
+                <h3>Личный менеджер</h3>
+                <p>На связи 24/7: подберёт маршрут и останется рядом в поездке.</p>
+            </div>
+            <div class="feature">
+                <div class="icon"></div>
+                <h3>Рассрочка 0%</h3>
+                <p>Платите частями без переплат — удобно для больших семейных туров.</p>
+            </div>
+            <div class="feature">
+                <div class="icon"></div>
+                <h3>Авторские маршруты</h3>
+                <p>Уникальные локации, куда не водят массовые группы из отелей.</p>
+            </div>
+            <div class="feature">
+                <div class="icon"></div>
+                <h3>Проверенные отели</h3>
+                <p>Мы лично тестируем отели и выбираем только те, где отдыхали сами.</p>
+            </div>
+            <div class="feature">
+                <div class="icon"></div>
+                <h3>Бесплатная отмена</h3>
+                <p>Возврат денег за 14 дней до старта тура без штрафов и вопросов.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="video-section">
+        <h2>Один день <span>в пути</span></h2>
+        <p class="subtitle">Как выглядит путешествие с нами изнутри.</p>
+        <div class="video-wrapper">
+            <video controls poster="">
+                <source src="video/tour.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+        </div>
+    </section>
+
+    <section id="reviews">
+        <h2>Отзывы <span>туристов</span></h2>
+        <div class="reviews-grid">
+            <div class="review">
+                <div class="stars">★★★★★</div>
+                <p>«Лучший отпуск за 10 лет! Организация на высоте: трансферы, отели, экскурсии — всё точно по плану.»</p>
+                <div class="author">
+                    <img src="images/АННА.avif" alt="Анна">
+                    <div>
+                        <div class="name">Анна К.</div>
+                        <div class="from">тур на Бали</div>
+                    </div>
+                </div>
+            </div>
+            <div class="review">
+                <div class="stars">★★★★★</div>
+                <p>«Камчатка — это что-то невероятное. Гид знал каждую тропу, видели медведей и гейзеры. Спасибо!»</p>
+                <div class="author">
+                    <img src="images/ДМИТРИЙ.avif" alt="Дмитрий">
+                    <div>
+                        <div class="name">Дмитрий П.</div>
+                        <div class="from">тур на Камчатку</div>
+                    </div>
+                </div>
+            </div>
+            <div class="review">
+                <div class="stars">★★★★☆</div>
+                <p>«Отдыхали семьёй в Дубае. Понравилось, чтоchildren развлекали отдельно. Вернёмся к ним снова!»</p>
+                <div class="author">
+                    <img src="images/МАРИЯ.jpg" alt="Мария">
+                    <div>
+                        <div class="name">Мария С.</div>
+                        <div class="from">тур в Дубай</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <h2>Тарифы <span>обслуживания</span></h2>
+        <div class="pricing-grid">
+            <div class="plan">
+                <h3>Базовый</h3>
+                <div class="cost">0 ₽</div>
+                <ul>
+                    <li>Подбор готовых туров</li>
+                    <li>Консультация по телефону</li>
+                    <li>Бронирование отеля</li>
+                    <li>Помощь с визой</li>
+                </ul>
+                <a href="#contact" class="btn btn-outline">Выбрать</a>
+            </div>
+            <div class="plan popular">
+                <div class="badge">Популярный</div>
+                <h3>Комфорт</h3>
+                <div class="cost">9 900 ₽</div>
+                <ul>
+                    <li>Индивидуальный маршрут</li>
+                    <li>Личный менеджер 24/7</li>
+                    <li>Трансферы включены</li>
+                    <li>Страховка и виза</li>
+                    <li>Скидка 10% на следующий тур</li>
+                </ul>
+                <a href="#contact" class="btn">Выбрать</a>
+            </div>
+            <div class="plan">
+                <h3>VIP</h3>
+                <div class="cost">29 900 ₽</div>
+                <ul>
+                    <li>Всё из «Комфорт»</li>
+                    <li>Бизнес-зал в аэропорту</li>
+                    <li>Премиум-отели 5★</li>
+                    <li>Гид-переводчик</li>
+                    <li>Консьерж-сервис</li>
+                </ul>
+                <a href="#contact" class="btn btn-outline">Выбрать</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq">
+        <h2>Частые <span>вопросы</span></h2>
+        <div class="faq">
+            <div class="faq-item">
+                <button class="faq-question">Как забронировать тур?</button>
+                <div class="faq-answer">Оставьте заявку на сайте или позвоните. Менеджер подберёт вариант, пришлёт договор и подтвердит бронь в течение часа.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Можно ли отменить поездку?</button>
+                <div class="faq-answer">Да, при отмене за 14 дней до старта возвращаем полную стоимость. Позже — частичный возврат по договору.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Нужна ли виза?</button>
+                <div class="faq-answer">Помогаем с оформлением визы в любую страну из нашего списка. Для некоторых направлений (Турция, Египет) виза не нужна.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Работаете ли с группами?</button>
+                <div class="faq-answer">Конечно! Организуем корпоративные выезды, школьные экскурсии и свадебные путешествия со скидками от 5 человек.</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="blog" class="blog">
+        <h2>Блог <span>путешественника</span></h2>
+        <div class="blog-grid">
+            <div class="post">
+                <img src="images/ФОТИК.webp" alt="Собираем чемодан">
+                <div class="post-body">
+                    <span class="date">20 ноября 2026</span>
+                    <h3>Что взять в ручную кладь: чек-лист</h3>
+                    <p>Собрали список из 15 вещей, которые спасут любую поездку — от переходника до запасной карты.</p>
+                    <a href="#">Читать →</a>
+                </div>
+            </div>
+            <div class="post">
+                <img src="images/РОССИЯ.webp" alt="Природа">
+                <div class="post-body">
+                    <span class="date">12 ноября 2026</span>
+                    <h3>5 мест России, о которых вы не знали</h3>
+                    <p>Лагуны, плато и заброшенные посёлки — куда поехать, если Кавказ и Камчатка уже исхожены.</p>
+                    <a href="#">Читать →</a>
+                </div>
+            </div>
+            <div class="post">
+                <img src="images/САМОЛЕТ.webp" alt="Кофе">
+                <div class="post-body">
+                    <span class="date">2 ноября 2026</span>
+                    <h3>Как дешёво летать: 7 лайфхаков</h3>
+                    <p>Когда покупать билеты, какие дни дешевле и как ловить горящие туры первыми.</p>
+                    <a href="#">Читать →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="subscribe">
+        <h2>Подпишись на <span>горящие туры</span></h2>
+        <p class="subtitle">Раз в неделю присылаем подборку туров со скидками до 40%. Без спама.</p>
+        <form onsubmit="event.preventDefault(); alert('Вы подписаны! Проверьте почту.'); this.reset();">
+            <input type="email" placeholder="Ваш e-mail" required>
+            <button class="btn" type="submit">Подписаться</button>
+        </form>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Оставьте <span>заявку</span></h2>
+        <form onsubmit="event.preventDefault(); alert('Спасибо! Мы свяжемся с вами.'); this.reset();">
+            <input type="text" placeholder="Ваше имя" required>
+            <input type="tel" placeholder="Телефон" required>
+            <input type="email" placeholder="E-mail">
+            <textarea rows="4" placeholder="Куда хотите поехать?"></textarea>
+            <button class="btn" type="submit">Отправить</button>
+        </form>
+    </section>
+
+    <footer>
+        <div class="socials">
+            <a href="#" title="Telegram">✈️</a>
+            <a href="#" title="VK">💬</a>
+            <a href="#" title="WhatsApp">📱</a>
+        </div>
+        <p>© 2026 Golden Route. Все права защищены.</p>
+        <p>info@wanderlust.ru · 8 (800) 555-35-35</p>
+    </footer>
+
+    <script>
+        
+        window.addEventListener('scroll', () => {
+            document.getElementById('header')
+                .classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                document.querySelectorAll('.faq-item').forEach(i => {
+                    if (i !== item) i.classList.remove('open');
+                });
+                item.classList.toggle('open');
+            });
+        });
+    </script>
+</body>
+</html>
+
